@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Archive</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #ffffff;
+            font-size: 2.5em;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        p.subtitle {
+            color: #888;
+            margin-bottom: 40px;
+            font-size: 0.9em;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .btn {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            border: 1px solid #333;
+            padding: 15px 20px;
+            margin: 10px;
+            width: 80%;
+            font-size: 1.2em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn:active {
+            transform: scale(0.95);
+            background-color: #333;
+        }
+        .back-btn {
+            background-color: transparent;
+            color: #ff4444;
+            border: 1px solid #ff4444;
+            margin-top: 30px;
+            width: 50%;
+        }
+        .file-btn {
+            background-color: #0a2540;
+            border-color: #0078D7;
+            text-transform: none;
+            font-size: 1.1em;
+        }
+        .hidden {
+            display: none;
+        }
+        #current-path {
+            color: #00ff88;
+            margin-bottom: 20px;
+            font-family: monospace;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>System Archive</h1>
+    <p class="subtitle">Secure Digital Repository</p>
+
+    <div class="container">
+        <!-- Path Indicator -->
+        <div id="current-path" class="hidden"></div>
+
+        <!-- Main Menu (Formats) -->
+        <div id="menu-main">
+            <button class="btn" onclick="openFormat('ISO')">ISO Archive</button>
+            <button class="btn" onclick="openFormat('EXE')">EXE Executables</button>
+            <button class="btn" onclick="openFormat('ZIP')">ZIP Archives</button>
+            <button class="btn" onclick="openFormat('APK')">APK Packages</button>
+        </div>
+
+        <!-- Sub Menu (Categories) -->
+        <div id="menu-sub" class="hidden">
+            <div id="sub-buttons"></div>
+            <button class="btn back-btn" onclick="goHome()">Back to Home</button>
+        </div>
+
+        <!-- File List (Downloads) -->
+        <div id="menu-files" class="hidden">
+            <div id="file-buttons"></div>
+            <button class="btn back-btn" onclick="goBackToFormat()">Back to Categories</button>
+        </div>
+    </div>
+
+    <script>
+        // The master database of your archive structure
+        const archiveDatabase = {
+            "ISO": {
+                "Games": ["GTA San Andreas.iso", "Need for Speed.iso"],
+                "OS": ["Windows 7 Ultimate.iso", "Windows 8.1 64-bit.iso", "Ubuntu Linux.iso"],
+                "Office": ["MS Office 2016 Professional.iso"]
+            },
+            "EXE": {
+                "Games": ["Minecraft_Setup.exe", "Plague_Inc_Installer.exe", "Poppy_Playtime_Setup.exe"]
+            },
+            "ZIP": {
+                "Games": ["Retro_ROM_Pack.zip", "World_of_Tanks_Blitz_Data.zip"],
+                "Office": ["Office_Portable_Edition.zip"]
+            },
+            "APK": {
+                "Games": ["World_of_Tanks_Blitz.apk", "Minecraft_PE.apk"],
+                "Apps": ["Concepts_Premium.apk", "Ibis_Paint.apk"]
+            }
+        };
+
+        let currentFormat = "";
+
+        // UI Element References
+        const pathText = document.getElementById("current-path");
+        const menuMain = document.getElementById("menu-main");
+        const menuSub = document.getElementById("menu-sub");
+        const menuFiles = document.getElementById("menu-files");
+        const subButtonsDiv = document.getElementById("sub-buttons");
+        const fileButtonsDiv = document.getElementById("file-buttons");
+
+        function openFormat(format) {
+            currentFormat = format;
+            menuMain.classList.add("hidden");
+            menuSub.classList.remove("hidden");
+            pathText.classList.remove("hidden");
+            
+            pathText.innerText = "root / " + format;
+            subButtonsDiv.innerHTML = ""; // Clear old buttons
+
+            // Look up the categories for the selected format in the database
+            const categories = Object.keys(archiveDatabase[format]);
+            
+            categories.forEach(category => {
+                let btn = document.createElement("button");
+                btn.className = "btn";
+                btn.innerText = category;
+                btn.onclick = () => openCategory(format, category);
+                subButtonsDiv.appendChild(btn);
+            });
+        }
+
+        function openCategory(format, category) {
+            menuSub.classList.add("hidden");
+            menuFiles.classList.remove("hidden");
+            pathText.innerText = "root / " + format + " / " + category;
+            
+            fileButtonsDiv.innerHTML = ""; // Clear old buttons
+
+            // Look up the specific files in the database
+            const files = archiveDatabase[format][category];
+            
+            files.forEach(fileName => {
+                // In the future, this is where we will inject your Google Drive links
+                let btn = document.createElement("button");
+                btn.className = "btn file-btn";
+                btn.innerText = "Download " + fileName;
+                btn.onclick = () => alert("This will eventually link to the Google Drive file for: " + fileName);
+                fileButtonsDiv.appendChild(btn);
+            });
+        }
+
+        function goBackToFormat() {
+            menuFiles.classList.add("hidden");
+            openFormat(currentFormat);
+        }
+
+        function goHome() {
+            menuSub.classList.add("hidden");
+            menuFiles.classList.add("hidden");
+            pathText.classList.add("hidden");
+            menuMain.classList.remove("hidden");
+            currentFormat = "";
+        }
+    </script>
+</body>
+</html>
